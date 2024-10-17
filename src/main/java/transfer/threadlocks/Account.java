@@ -84,21 +84,31 @@ public class Account {
 	 **/
 	public void transfer(Account toAccount, BigDecimal amount) {
 		BigDecimal originalBalance = balance;
+		// 두 계좌를 동시에 잠금하기 위해 계좌 번호에 따라 잠금 순서 결정
+		Account firstLock = this;
+		Account secondLock = toAccount;
+
+		if (this.getAccountNumber().compareTo(toAccount.getAccountNumber()) > 0) {
+			firstLock = toAccount;
+			secondLock = this;
+		}
 
 		try {
-			synchronized (this) {
-				// 이체액은 계좌 잔액보다 작아야 한다.
-				if (isBalanceMoreThan(amount)) {
-					throw new IllegalArgumentException("이체액은 계좌 잔액보다 작거나 같아야 합니다.");
+			synchronized (firstLock) {
+				synchronized (secondLock) {                // 이체액은 계좌 잔액보다 작아야 한다.
+					if (isBalanceMoreThan(amount)) {
+						throw new IllegalArgumentException("이체액은 계좌 잔액보다 작거나 같아야 합니다.");
+					}
+					balance = balance.subtract(amount);
+					try {
+						toAccount.receiveTransfer(this, amount);
+						transactionHistory.add(
+							new AccountHistory(TransactionType.TRANSFER, amount, "", LocalDateTime.now()));
+					} catch (Exception e) {
+						rollbackBalance(originalBalance);
+						throw new IllegalArgumentException("이체를 실패했습니다. : " + e.getMessage());
+					}
 				}
-				balance = balance.subtract(amount);
-			}
-			try {
-				toAccount.receiveTransfer(this, amount);
-				transactionHistory.add(new AccountHistory(TransactionType.TRANSFER, amount, "", LocalDateTime.now()));
-			} catch (Exception e) {
-				rollbackBalance(originalBalance);
-				throw new IllegalArgumentException("이체를 실패했습니다. : " + e.getMessage());
 			}
 		} catch (Exception e) {
 			throw new IllegalArgumentException("이체를 실패했습니다. : " + e.getMessage());
