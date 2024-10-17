@@ -82,10 +82,9 @@ public class Banking {
 
 	/**
 	 * 이체하기
-	 * @param fromId
-	 * @param toId
+	 * @param fromId 송금인
+	 * @param toId 수금인
 	 * @param amount 이체액
-	 * @return true: 이체 성공, false: 이체 실패
 	 **/
 	public void transfer(String fromId, String toId, BigDecimal amount) {
 		try {

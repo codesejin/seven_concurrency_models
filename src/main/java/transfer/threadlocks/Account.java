@@ -83,18 +83,18 @@ public class Account {
 	 * @param amount 이체액
 	 **/
 	public void transfer(Account toAccount, BigDecimal amount) {
-		synchronized (this) {
-			// 이체액은 계좌 잔액보다 작아야 한다.
-			if (isBalanceMoreThan(amount)) {
-				throw new IllegalArgumentException("이체액은 계좌 잔액보다 작거나 같아야 합니다.");
-			}
-			try {
+		try {
+			synchronized (this) {
+				// 이체액은 계좌 잔액보다 작아야 한다.
+				if (isBalanceMoreThan(amount)) {
+					throw new IllegalArgumentException("이체액은 계좌 잔액보다 작거나 같아야 합니다.");
+				}
 				balance = balance.subtract(amount);
 				toAccount.receiveTransfer(this, amount);
-				transactionHistory.add(new AccountHistory(TransactionType.TRANSFER, amount, "", LocalDateTime.now()));
-			} catch (Exception e) {
-				throw new IllegalArgumentException("이체를 실패했습니다. : " + e.getMessage());
 			}
+			transactionHistory.add(new AccountHistory(TransactionType.TRANSFER, amount, "", LocalDateTime.now()));
+		} catch (Exception e) {
+			throw new IllegalArgumentException("이체를 실패했습니다. : " + e.getMessage());
 		}
 	}
 
@@ -106,14 +106,13 @@ public class Account {
 	public void receiveTransfer(Account fromAccount, BigDecimal amount) {
 		synchronized (this) {
 			// 계좌 잔액은 20억을 넘길 수 없다.
-			if (!isBalanceLessThanMaxBalance(fromAccount, amount)) {
+			if (!isBalanceLessThanMaxBalance(this, amount)) {
 				throw new IllegalArgumentException("계좌 잔액은 20억을 넘을 수 없습니다.");
 			}
 			balance = balance.add(amount);
 		}
 		transactionHistory.add(new AccountHistory(TransactionType.TRANSFER, amount, fromAccount.getAccountNumber(),
 			LocalDateTime.now()));
-
 	}
 
 	public synchronized BigDecimal getBalance() {
