@@ -83,6 +83,8 @@ public class Account {
 	 * @param amount 이체액
 	 **/
 	public void transfer(Account toAccount, BigDecimal amount) {
+		BigDecimal originalBalance = balance;
+
 		try {
 			synchronized (this) {
 				// 이체액은 계좌 잔액보다 작아야 한다.
@@ -90,9 +92,14 @@ public class Account {
 					throw new IllegalArgumentException("이체액은 계좌 잔액보다 작거나 같아야 합니다.");
 				}
 				balance = balance.subtract(amount);
-				toAccount.receiveTransfer(this, amount);
 			}
-			transactionHistory.add(new AccountHistory(TransactionType.TRANSFER, amount, "", LocalDateTime.now()));
+			try {
+				toAccount.receiveTransfer(this, amount);
+				transactionHistory.add(new AccountHistory(TransactionType.TRANSFER, amount, "", LocalDateTime.now()));
+			} catch (Exception e) {
+				rollbackBalance(originalBalance);
+				throw new IllegalArgumentException("이체를 실패했습니다. : " + e.getMessage());
+			}
 		} catch (Exception e) {
 			throw new IllegalArgumentException("이체를 실패했습니다. : " + e.getMessage());
 		}
@@ -113,6 +120,17 @@ public class Account {
 		}
 		transactionHistory.add(new AccountHistory(TransactionType.TRANSFER, amount, fromAccount.getAccountNumber(),
 			LocalDateTime.now()));
+	}
+
+	/**
+	 * 송신 계좌 잔액 롤백
+	 * 수신 계좌에 돈을 보내는데 실패하면 송신 계좌에 다시 원래 금액을 추가
+	 * @param originalBalance 원래 잔액
+	 **/
+	private void rollbackBalance(BigDecimal originalBalance) {
+		synchronized (this) {
+			balance = originalBalance;
+		}
 	}
 
 	public synchronized BigDecimal getBalance() {

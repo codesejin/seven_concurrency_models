@@ -38,6 +38,12 @@ public class Concurrency {
 		for (int i = 0; i < 1000; i++) {
 			executorService.submit(() -> {
 				banking.transfer("1","2", BigDecimal.valueOf(2000));
+				// 이체 중간에 지연을 추가하여 동시성 문제 유발 가능성 증가
+				try {
+					Thread.sleep(10);  // 고의로 지연 추가 (충돌 가능성 높임)
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 				banking.transfer("2", "1", BigDecimal.valueOf(2000));
 
 				transferLatch.countDown(); // 입금이 끝날 때마다 countDown 호출
