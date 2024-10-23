@@ -10,18 +10,18 @@ public class Puzzle {
 		}
 	};
 	static Thread t2 = new Thread() {
-		// public void run() {
-		// 	if (answerReady)
-		// 		System.out.println("The meaning of life is: " + answer);
-		// 	else
-		// 		System.out.println("I don't know the answer");
-		// }
 		public void run() {
-			while (!answerReady) {
-					//Thread.sleep(100);
+			if (answerReady)
 				System.out.println("The meaning of life is: " + answer);
-			}
+			else
+				System.out.println("I don't know the answer");
 		}
+		// public void run() {
+		// 	while (!answerReady) {
+		// 			Thread.sleep(100);
+		// 		System.out.println("The meaning of life is: " + answer);
+		// 	}
+		// }
 	};
 
 	public static void main(String[] args) throws InterruptedException {
