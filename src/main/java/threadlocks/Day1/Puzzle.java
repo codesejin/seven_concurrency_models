@@ -1,4 +1,4 @@
-package threadlocks;
+package threadlocks.Day1;
 
 public class Puzzle {
 	static boolean answerReady = false;

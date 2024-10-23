@@ -1,4 +1,4 @@
-package threadlocks;
+package threadlocks.Day1;
 
 public class HelloWorld {
 
