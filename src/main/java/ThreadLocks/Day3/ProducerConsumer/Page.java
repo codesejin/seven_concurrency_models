@@ -1,4 +1,4 @@
-package threadlocks.Day3.ProducerConsumer;
+package ThreadLocks.Day3.ProducerConsumer;
 
 abstract class Page {
 	public String getTitle() { throw new UnsupportedOperationException(); }

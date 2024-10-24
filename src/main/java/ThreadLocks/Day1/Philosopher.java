@@ -1,4 +1,4 @@
-package threadlocks.Day1;
+package ThreadLocks.Day1;
 
 import java.util.Random;
 

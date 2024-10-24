@@ -1,11 +1,10 @@
-package threadlocks.Day3;
+package ThreadLocks.Day3;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**

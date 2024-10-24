@@ -1,4 +1,4 @@
-package threadlocks.Day3.ProducerConsumer;
+package ThreadLocks.Day3.ProducerConsumer;
 
 import java.text.BreakIterator;
 import java.util.Iterator;

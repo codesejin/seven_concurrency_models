@@ -1,4 +1,4 @@
-package threadlocks.Day2;
+package ThreadLocks.Day2;
 
 public class Uninterruptible {
 

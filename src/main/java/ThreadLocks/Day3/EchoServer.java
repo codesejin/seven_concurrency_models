@@ -1,4 +1,4 @@
-package threadlocks.Day3;
+package ThreadLocks.Day3;
 
 import java.io.IOException;
 import java.io.InputStream;
