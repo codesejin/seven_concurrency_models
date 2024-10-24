@@ -1,4 +1,4 @@
-package threadlocks.Day1;
+package threadlocks.Day3;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -6,39 +6,32 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
+/**
+ * 방어적 복사 대신 CopyOnWriteArrayList 사용
+ **/
 public class Downloader extends Thread {
 	private InputStream in;
 	private OutputStream out;
-	private ArrayList<ProgressListener> listeners;
+	private CopyOnWriteArrayList<ProgressListener> listeners;
 
 	public Downloader(URL url, String outputFilename) throws IOException {
 		in = url.openConnection().getInputStream();
 		out = new FileOutputStream(outputFilename);
-		listeners = new ArrayList<ProgressListener>();
+		listeners = new CopyOnWriteArrayList<ProgressListener>();
 	}
 
-	public synchronized void addListener(ProgressListener listener) {
+	public void addListener(ProgressListener listener) {
 		listeners.add(listener);
 	}
 
-	public synchronized void removeListener(ProgressListener listener) {
+	public void removeListener(ProgressListener listener) {
 		listeners.remove(listener);
 	}
 
-	// // 데드락 발생 -> 외부 메소드가 호출될때 중첩잠금이 발생할 수 있음
-	// private synchronized void updateProgress(int n) {
-	// 	for (ProgressListener listener: listeners) {
-	// 		listener.onProgress(n); // 외부 메서드 호출
-	// 	}
-	// }
-
 	private void updateProgress(int n) {
-		ArrayList<ProgressListener> listenersCopy;
-		synchronized(this) {
-			listenersCopy = (ArrayList<ProgressListener>) listeners.clone();
-		}
-		for (ProgressListener listener: listenersCopy) {
+		for (ProgressListener listener: listeners) {
 			listener.onProgress(n);
 		}
 	}
